@@ -17,7 +17,15 @@ class Order extends Application {
 
     // start a new order
     function neworder() {
-        //FIXME
+        
+        $order_num = $this->orders->highest() + 1;
+        
+        $record = $this->orders->create();
+        $record->num = $order_num;
+        $record->date = time();
+        $record->status = 'o';
+        $this->orders->add($record );
+        
 
         redirect('/order/display_menu/' . $order_num);
     }
@@ -29,19 +37,36 @@ class Order extends Application {
 
         $this->data['pagebody'] = 'show_menu';
         $this->data['order_num'] = $order_num;
-        //FIXME
+        
+        //get menu info
+        $order = $this->orders->get($order_num);
+        
 
         // Make the columns
         $this->data['meals'] = $this->make_column('m');
         $this->data['drinks'] = $this->make_column('d');
         $this->data['sweets'] = $this->make_column('s');
+        $this->data['title'] = $order_num;
+        foreach( $this->data['meals'] as &$item )
+        {
+            $item->order_num = $order_num;
+        }
+        foreach( $this->data['drinks'] as &$item )
+        {
+            $item->order_num = $order_num;
+        }
+        foreach( $this->data['sweets'] as &$item )
+        {
+            $item->order_num = $order_num;
+        }
 
         $this->render();
     }
 
     // make a menu ordering column
     function make_column($category) {
-        //FIXME
+        $items = $this->menu->some('category', $category );
+        
         return $items;
     }
 
@@ -56,6 +81,7 @@ class Order extends Application {
         $this->data['title'] = 'Checking Out';
         $this->data['pagebody'] = 'show_order';
         $this->data['order_num'] = $order_num;
+        $this->data['total'] = $this->orders->total($order_num);
         //FIXME
 
         $this->render();

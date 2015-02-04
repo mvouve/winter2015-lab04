@@ -19,6 +19,12 @@ class Orders extends MY_Model {
 
     // calculate the total for an order
     function total($num) {
+        $this->orderitems->some('order', $num);
+        
+        //foreach()
+        
+        
+        //foreach( )
         return 0.0;
     }
 
