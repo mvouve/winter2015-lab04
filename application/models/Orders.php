@@ -14,18 +14,38 @@ class Orders extends MY_Model {
 
     // add an item to an order
     function add_item($num, $code) {
+        $CI = &get_instance();
         
+        if($CI->orderitems->exists($num, $code))
+        {
+            $instance = $CI->orderitems->get($num, $code);
+            $instance->quantity++;
+            $CI->orderitems->update($instance);
+        }
+        else
+        {
+            $instance = $CI->orderitems->create();
+            $instance->order = $num;
+            $instance->item = $code;
+            $instance->quantity = 1;
+            $CI->orderitems->add($instance);
+        }
     }
 
     // calculate the total for an order
     function total($num) {
-        $this->orderitems->some('order', $num);
+        $this->load->model('orderitems');
         
-        //foreach()
+        $result = 0.0;
+        $items = $this->orderitems->some('order', $num);
         
+        foreach( $items as $item )
+        {
+           $menuitem = $this->menu->get($item->item);
+           $result = $item->quantity * $menuitem->price;
+        }
         
-        //foreach( )
-        return 0.0;
+        return $result;
     }
 
     // retrieve the details for an order

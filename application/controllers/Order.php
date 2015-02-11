@@ -40,25 +40,14 @@ class Order extends Application {
         
         //get menu info
         $order = $this->orders->get($order_num);
+        $total = number_format( $this->orders->total($order_num), 2);
         
 
         // Make the columns
         $this->data['meals'] = $this->make_column('m');
         $this->data['drinks'] = $this->make_column('d');
         $this->data['sweets'] = $this->make_column('s');
-        $this->data['title'] = $order_num;
-        foreach( $this->data['meals'] as &$item )
-        {
-            $item->order_num = $order_num;
-        }
-        foreach( $this->data['drinks'] as &$item )
-        {
-            $item->order_num = $order_num;
-        }
-        foreach( $this->data['sweets'] as &$item )
-        {
-            $item->order_num = $order_num;
-        }
+        $this->data['title'] = 'Order # ('.$total.')';
 
 	// Bit of a hokey patch here, to work around the problem of the template
 	// parser no longer allowing access to a parent variable inside a
@@ -94,7 +83,7 @@ class Order extends Application {
 
     // add an item to an order
     function add($order_num, $item) {
-        //FIXME
+        $this->orders->add_item($order_num, $item);
         redirect('/order/display_menu/' . $order_num);
     }
 
