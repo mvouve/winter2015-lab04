@@ -42,7 +42,7 @@ class Orders extends MY_Model {
         foreach( $items as $item )
         {
            $menuitem = $this->menu->get($item->item);
-           $result = $item->quantity * $menuitem->price;
+           $result += ($item->quantity * $menuitem->price);
         }
         
         return $result;
@@ -61,7 +61,18 @@ class Orders extends MY_Model {
     // validate an order
     // it must have at least one item from each category
     function validate($num) {
-        return false;
+        $CI = &get_instance();
+        $items = $CI->orderitems->group($num);
+        $chosen = array();
+        // Create an array that contains all used menu categories as indicies.
+        if (count($items) > 0) {
+            foreach($items as $item) {
+                $menu = $CI->menu->get($item->item);
+                $chosen[$menu->category] = 1;
+            }
+        }
+        // Return valid only if 'm', 'd,' and 's' categories were used.
+        return ($chosen['m'] && $chosen['d'] && $chosen['s']);
     }
 
 }
